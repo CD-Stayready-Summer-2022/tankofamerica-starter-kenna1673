@@ -1,49 +1,55 @@
 package com.codedifferently.tankofamerica.domain.account.models;
 
+import com.codedifferently.tankofamerica.domain.user.models.User;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(name="accounts")
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String firstName;
-    private String lastName;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name= "uuid2", strategy = "uuid2")
+    @Type(type="uuid-char")
+    private UUID id;
+    private String name;
     private Double balance;
+
+    @ManyToOne()
+    private User owner;
 
     public Account() {
     }
 
-    public Account(String firstName, String lastName, Double balance) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.balance = balance;
+    public Account(String name) {
+        this.name = name;
+        this.balance = 0.0;
     }
 
-    public Long getId() {
+    public Account(String name, User owner) {
+        this.name = name;
+        this.balance = 0.0;
+        this.owner = owner;
+    }
+
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Double getBalance() {
@@ -54,7 +60,15 @@ public class Account {
         this.balance = balance;
     }
 
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User owner) {
+        this.owner = owner;
+    }
+
     public String toString() {
-        return String.format("%d %s %s $%.2f", id, firstName, lastName, balance);
+        return String.format("Account for %s named %s with id %s and balance $%.2f", owner.getFirstName(), name, id.toString(), balance);
     }
 }

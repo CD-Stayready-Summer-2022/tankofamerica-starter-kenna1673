@@ -2,6 +2,8 @@ package com.codedifferently.tankofamerica.domain.account.controllers;
 
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
+import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
+import com.codedifferently.tankofamerica.domain.user.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.shell.standard.ShellComponent;
 import org.springframework.shell.standard.ShellMethod;
@@ -18,20 +20,24 @@ public class AccountController {
     }
 
     @ShellMethod("Create a new account")
-    public Account createNewAccount(@ShellOption({"-F", "--firstname"}) String firstName,
-                                    @ShellOption({"-L", "--lastname"}) String lastName,
-                                    @ShellOption({"-B", "--balance"}) Double balance) {
-
-        Account account = new Account(firstName, lastName, balance);
-        account = accountService.create(account);
-        return account;
+    public String createNewAccount(@ShellOption({"-U","--user"}) Long id,
+                                    @ShellOption({"-N", "--name"}) String name) {
+        try {
+            Account account = new Account(name);
+            account = accountService.create(id, account);
+            return account.toString();
+        } catch (UserNotFoundException e) {
+            return "The User Id is invalid";
+        }
     }
 
-    @ShellMethod("Get all users")
-    public String getAllAccounts() {
-        return accountService.getAllAccounts();
+    @ShellMethod("Get user accounts")
+    public String userAccounts(@ShellOption({"-U", "--user"}) Long id) {
+        try {
+            String accounts = accountService.getAllFromUser(id);
+            return accounts;
+        } catch (UserNotFoundException e) {
+            return "The user Id is invalid";
+        }
     }
-
-
-
 }
