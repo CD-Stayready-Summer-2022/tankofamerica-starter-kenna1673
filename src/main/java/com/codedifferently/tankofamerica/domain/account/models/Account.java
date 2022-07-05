@@ -1,10 +1,14 @@
 package com.codedifferently.tankofamerica.domain.account.models;
 
+import com.codedifferently.tankofamerica.domain.transaction.exceptions.OverdraftException;
+import com.codedifferently.tankofamerica.domain.transaction.models.Transaction;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -21,6 +25,9 @@ public class Account {
 
     @ManyToOne()
     private User owner;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy="account")
+    private Set<Transaction> transactions;
 
     public Account() {
     }
@@ -68,7 +75,37 @@ public class Account {
         this.owner = owner;
     }
 
+    public Set<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public void setTransactions(Set<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    public void updateBalance(Double amount) throws OverdraftException {
+        Double newBalance = balance + amount;
+        if (newBalance < 0) {
+            throw new OverdraftException("Not enough funds!");
+        } else {
+            balance = newBalance;
+        }
+    }
+
     public String toString() {
         return String.format("Account for %s named %s with id %s and balance $%.2f", owner.getFirstName(), name, id.toString(), balance);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(id, account.id) && Objects.equals(name, account.name) && Objects.equals(balance, account.balance) && Objects.equals(owner, account.owner);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, balance, owner);
     }
 }

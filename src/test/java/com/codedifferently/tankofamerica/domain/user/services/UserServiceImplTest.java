@@ -14,6 +14,8 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(properties = {
@@ -30,7 +32,7 @@ public class UserServiceImplTest {
     private UserRepo userRepo;
 
     @Test
-    public void getAllUsersTest01() throws UserNotFoundException {
+    public void getByIdTest01() throws UserNotFoundException {
         // Given
         User mockUser = new User("Tariq", "Hook", "email@email", "pass");
         mockUser.setId(1l);
@@ -40,11 +42,30 @@ public class UserServiceImplTest {
     }
 
     @Test
-    public void getAllUsersTest02(){
+    public void getByIdTest02(){
         BDDMockito.doReturn(Optional.empty()).when(userRepo).findById(1l);
         Assertions.assertThrows(UserNotFoundException.class, ()->{
             userService.getById(1l);
         });
     }
 
+    @Test
+    public void createTest01() {
+        User mockUser = new User("McKenna", "O'Hara", "email", "passwrod");
+        mockUser.setId(1L);
+        BDDMockito.doReturn(mockUser).when(userRepo).save(mockUser);
+        User actual = userService.create(mockUser);
+        Assertions.assertEquals(mockUser, actual);
+    }
+
+    @Test
+    public void getAllUsersTest01() {
+        User mockUser = new User("McKenna", "O'Hara", "email", "password");
+        mockUser.setId(1L);
+        Iterable<User> users = new ArrayList<>(List.of(mockUser));
+        BDDMockito.doReturn(users).when(userRepo).findAll();
+        String expected = "1 McKenna O'Hara email password";
+        String actual = userService.getAllUsers();
+        Assertions.assertEquals(expected, actual);
+    }
 }

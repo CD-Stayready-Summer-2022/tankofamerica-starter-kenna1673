@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.account.controllers;
 
+import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
@@ -29,6 +30,17 @@ public class AccountController {
         } catch (UserNotFoundException e) {
             return "The User Id is invalid";
         }
+    }
+
+    @ShellMethod("Get account by id")
+    public Account getAccountById(@ShellOption({"-I", "--accountid"}) String accountId) {
+        Account account = null;
+        try {
+            account = accountService.getById(accountId);
+        } catch (AccountNotFoundException | IllegalArgumentException ex) {
+            System.out.printf(ex.getMessage() + "\n");
+        }
+        return account;
     }
 
     @ShellMethod("Get user accounts")

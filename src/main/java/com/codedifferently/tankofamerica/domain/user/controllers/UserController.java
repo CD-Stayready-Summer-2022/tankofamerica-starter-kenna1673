@@ -1,5 +1,6 @@
 package com.codedifferently.tankofamerica.domain.user.controllers;
 
+import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
 import com.codedifferently.tankofamerica.domain.user.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,21 @@ public class UserController {
         User user = new User(firstName,lastName,email,password);
         user = userService.create(user);
         return user;
-
     }
 
     @ShellMethod("Get All Users")
     public String getAllUsers(){
         return userService.getAllUsers();
+    }
+
+    @ShellMethod("Get user by id")
+    public User getUserById(@ShellOption({"-I", "--userid"}) Long userId) {
+        User user = null;
+        try {
+            user = userService.getById(userId);
+        } catch (UserNotFoundException e) {
+            System.out.printf("User with id %d does not exist%n", userId);
+        }
+        return user;
     }
 }
