@@ -2,6 +2,7 @@ package com.codedifferently.tankofamerica.domain.transaction.services;
 
 import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
+import com.codedifferently.tankofamerica.domain.transaction.exceptions.OverdraftException;
 import com.codedifferently.tankofamerica.domain.transaction.exceptions.TransactionNotFoundException;
 import com.codedifferently.tankofamerica.domain.transaction.models.Transaction;
 import com.codedifferently.tankofamerica.domain.transaction.repos.TransactionRepo;
@@ -36,6 +37,7 @@ public class TransactionServiceImplTest {
     private Account account;
     private User user;
     private Transaction transaction;
+    private Transaction transaction2;
 
     @BeforeEach
     public void setUp() {
@@ -44,15 +46,25 @@ public class TransactionServiceImplTest {
         account = new Account("travel", user);
         account.setId(UUID.fromString("aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd"));
         transaction = new Transaction(100.00, account);
+        transaction2 = new Transaction(-100.00, account);
         transaction.setId(1L);
+        transaction2.setId(2L);
     }
 
     @Test
-    public void createTest01() throws AccountNotFoundException {
+    public void createTest01() throws AccountNotFoundException, OverdraftException {
         String id = "aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd";
         BDDMockito.doReturn(transaction).when(transactionRepo).save(transaction);
         Transaction actual = transactionService.create(id, transaction);
         Assertions.assertEquals(transaction, actual);
+    }
+
+    @Test
+    public void createTest02() throws AccountNotFoundException {
+        String id = "aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd";
+        Assertions.assertThrows(OverdraftException.class, ()->{
+            transactionService.create(id, transaction2);
+        });
     }
 
     @Test

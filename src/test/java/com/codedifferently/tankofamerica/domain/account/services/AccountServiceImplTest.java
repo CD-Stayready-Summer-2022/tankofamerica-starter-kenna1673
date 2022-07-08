@@ -82,10 +82,12 @@ public class AccountServiceImplTest {
         });
     }
 
+
     /*
     @Test
     public void getAllFromUserTest01() throws UserNotFoundException {
-        Iterable<Account> accounts = new ArrayList<>(List.of(account));
+        Iterable<Account> accounts = new ArrayList<>();
+        BDDMockito.doReturn(account).when(accountRepo).save(account);
         BDDMockito.doReturn(accounts).when(accountRepo).findByOwner(user);
         String expected = "Account for McKenna named travel with id aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd and balance $0.00";
         String actual = accountService.getAllFromUser(1L);

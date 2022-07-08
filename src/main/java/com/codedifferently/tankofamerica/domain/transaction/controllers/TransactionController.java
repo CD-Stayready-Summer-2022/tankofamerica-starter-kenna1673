@@ -25,12 +25,10 @@ public class TransactionController {
         this.accountService = accountService;
     }
 
-    @ShellMethod("Make a deposit") // creates new transaction but does not properly update account balance
+    @ShellMethod("Make a deposit")
     public String deposit(@ShellOption({"-I", "--accountid"}) String accountId,
                           @ShellOption({"A", "--amount"}) Double amount) throws AccountNotFoundException, OverdraftException {
         Account account = accountService.getById(accountId);
-        account.updateBalance(amount);
-        account = accountService.update(account);
         Transaction transaction = new Transaction(amount, account);
         transactionService.create(accountId, transaction);
         return transaction.toString();
@@ -41,10 +39,7 @@ public class TransactionController {
                             @ShellOption({"-A", "--amount"}) Double amount) throws AccountNotFoundException {
         try {
             Account account = accountService.getById(accountId);
-            amount = (-1) * amount;
-            account.updateBalance(amount);
-            account = accountService.update(account);
-            Transaction transaction = new Transaction(amount, account);
+            Transaction transaction = new Transaction((-1) * amount, account);
             transactionService.create(accountId, transaction);
             return transaction.toString();
         } catch (OverdraftException e) {
@@ -63,5 +58,18 @@ public class TransactionController {
         return transaction;
     }
 
+    @ShellMethod("Get all transactions from account")
+    public String accountTransactions(@ShellOption({"A", "-account"}) String accountId) throws AccountNotFoundException {
+        return transactionService.getAllFromAccount(accountId);
+    }
 
+    @ShellMethod("Get all deposits")
+    public String accountDeposits(@ShellOption({"A", "-account"}) String accountId) throws AccountNotFoundException {
+        return transactionService.getAllDeposits(accountId);
+    }
+    
+    @ShellMethod("Get all withdrawals")
+    public String accountWithdrawals(@ShellOption({"-A", "-account"}) String accountId) throws AccountNotFoundException {
+        return transactionService.getAllWithdrawals(accountId);
+    }
 }

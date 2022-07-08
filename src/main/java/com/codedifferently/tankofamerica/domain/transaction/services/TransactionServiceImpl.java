@@ -3,12 +3,14 @@ package com.codedifferently.tankofamerica.domain.transaction.services;
 import com.codedifferently.tankofamerica.domain.account.exceptions.AccountNotFoundException;
 import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.services.AccountService;
+import com.codedifferently.tankofamerica.domain.transaction.exceptions.OverdraftException;
 import com.codedifferently.tankofamerica.domain.transaction.exceptions.TransactionNotFoundException;
 import com.codedifferently.tankofamerica.domain.transaction.models.Transaction;
 import com.codedifferently.tankofamerica.domain.transaction.repos.TransactionRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,10 +27,17 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction create(String accountId, Transaction transaction) throws AccountNotFoundException {
-        Account account = accountService.getById(accountId);
-        transaction.setAccount(account);
-        return transactionRepo.save(transaction);
+    public Transaction create(String accountId, Transaction transaction) throws AccountNotFoundException, OverdraftException {
+        try {
+            Double amount = transaction.getAmount();
+            Account account = transaction.getAccount();
+            account.updateBalance(amount);
+            account = accountService.update(account);
+            transaction.setAccount(account);
+            return transactionRepo.save(transaction);
+        } catch (OverdraftException e) {
+            throw new OverdraftException("Not enough funds!");
+        }
     }
 
     @Override
@@ -41,18 +50,42 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public String getAllFromAccount(String accountId) {
-        return null;
+    public String getAllFromAccount(String accountId) throws AccountNotFoundException {
+        Account account = accountService.getById(accountId);
+        List<Transaction> transactions = transactionRepo.findByAccount(account);
+        StringBuilder builder = new StringBuilder();
+        for (Transaction transaction : transactions) {
+            builder.append(transaction).append("\n");
+        }
+        return builder.toString().trim();
     }
 
     @Override
-    public String getAllWithdrawals(String accountId) {
-        return null;
+    public String getAllWithdrawals(String accountId) throws AccountNotFoundException {
+        Account account = accountService.getById(accountId);
+        List<Transaction> transactions = transactionRepo.findByAccount(account);
+        StringBuilder builder = new StringBuilder();
+        for (Transaction transaction : transactions) {
+            Double amount = transaction.getAmount();
+            if (amount < 0) {
+                builder.append(transaction).append("\n");
+            }
+        }
+        return (builder.toString()).trim();
     }
 
     @Override
-    public String getAllDeposits(String accountId) {
-        return null;
+    public String getAllDeposits(String accountId) throws AccountNotFoundException {
+        Account account = accountService.getById(accountId);
+        List<Transaction> transactions = transactionRepo.findByAccount(account);
+        StringBuilder builder = new StringBuilder();
+        for (Transaction transaction : transactions) {
+            Double amount = transaction.getAmount();
+            if (amount > 0) {
+                builder.append(transaction).append("\n");
+            }
+        }
+        return (builder.toString()).trim();
     }
 
     @Override

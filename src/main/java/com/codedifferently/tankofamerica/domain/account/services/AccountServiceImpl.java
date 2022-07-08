@@ -52,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
         User owner = userService.getById(userId);
         List<Account> accounts = accountRepo.findByOwner(owner);
         for (Account account : accounts) {
-            builder.append(account.toString() + "\n");
+            builder.append(account.toString()).append("\n");
         }
         return builder.toString().trim();
     }
@@ -61,5 +61,4 @@ public class AccountServiceImpl implements AccountService {
         accountRepo.save(account);
         return account;
     }
-
 }
