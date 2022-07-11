@@ -19,6 +19,8 @@ import org.springframework.shell.jline.InteractiveShellApplicationRunner;
 import org.springframework.shell.jline.ScriptShellApplicationRunner;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -56,7 +58,7 @@ public class TransactionServiceImplTest {
         String id = "aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd";
         BDDMockito.doReturn(transaction).when(transactionRepo).save(transaction);
         Transaction actual = transactionService.create(id, transaction);
-        Assertions.assertEquals(transaction, actual);
+        Assertions.assertEquals(100, transaction.getAccount().getBalance());
     }
 
     @Test
@@ -83,4 +85,20 @@ public class TransactionServiceImplTest {
             transactionService.getById(1L);
         });
     }
+    
+    @Test
+    public void getAllFromAccountTest01() {
+        // Given
+
+        // WHen
+        List<Transaction> transactions = new ArrayList<>();
+        BDDMockito.doReturn(transactions).when(transactionRepo).findByAccount(account);
+        for (Transaction transaction : transactions) {
+            System.out.println(transaction.toString());
+        }
+        String expected = String.format("Amount: %.2f Account id: %s. Balance is: %.2f", 100.00, account.getId().toString(), account.getBalance());
+        // Then
+    } 
+
+
 }

@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -89,13 +89,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction getFirstTransaction(String accountId) {
-        return null;
+    public String getFirstTransaction(String accountId) throws AccountNotFoundException {
+        Account account = accountService.getById(accountId);
+        List<Transaction> transactions = transactionRepo.findByAccount(account);
+        if (!transactions.isEmpty()) {
+            return transactions.get(0).toString();
+        }
+        return "You currently have no transactions!";
     }
 
     @Override
-    public Transaction getMostRecentTransaction(String accountId) {
-        return null;
+    public String getMostRecentTransaction(String accountId) throws AccountNotFoundException {
+        Account account = accountService.getById(accountId);
+        List<Transaction> transactions = transactionRepo.findByAccount(account);
+        if (!transactions.isEmpty()) {
+            return transactions.get(transactions.size() - 1).toString();
+        }
+        return "You currently have no transactions!";
     }
 
     public TransactionRepo getTransactionRepo() {

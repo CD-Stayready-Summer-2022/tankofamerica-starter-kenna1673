@@ -13,6 +13,6 @@ public interface TransactionService {
     String getAllFromAccount(String accountId) throws AccountNotFoundException;
     String getAllWithdrawals(String accountId) throws AccountNotFoundException;
     String getAllDeposits(String accountId) throws AccountNotFoundException;
-    Transaction getFirstTransaction(String accountId);
-    Transaction getMostRecentTransaction(String accountId);
+    String getFirstTransaction(String accountId) throws AccountNotFoundException;
+    String getMostRecentTransaction(String accountId) throws AccountNotFoundException;
 }

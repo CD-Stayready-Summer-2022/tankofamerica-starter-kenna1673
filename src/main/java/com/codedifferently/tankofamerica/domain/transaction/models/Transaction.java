@@ -54,7 +54,7 @@ public class Transaction {
     }
 
     public String toString() {
-        return String.format("Amount: %.2f Account id: %s", amount, account.getId().toString());
+        return String.format("Amount: %.2f Account id: %s. Balance is: %.2f", amount, account.getId().toString(), account.getBalance());
     }
 
     @Override

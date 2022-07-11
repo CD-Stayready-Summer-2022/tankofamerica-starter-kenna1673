@@ -6,7 +6,6 @@ import com.codedifferently.tankofamerica.domain.account.models.Account;
 import com.codedifferently.tankofamerica.domain.account.repos.AccountRepo;
 import com.codedifferently.tankofamerica.domain.user.exceptions.UserNotFoundException;
 import com.codedifferently.tankofamerica.domain.user.models.User;
-import com.codedifferently.tankofamerica.domain.user.repos.UserRepo;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,8 @@ public class AccountServiceImplTest {
     public void setUp() {
         user = new User("McKenna", "O'Hara", "email", "password");
         user.setId(1L);
-        account = new Account("travel", user);
+        account = new Account("travel");
+        account.setOwner(user);
         account.setId(UUID.fromString("aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd"));
     }
 
@@ -83,16 +83,17 @@ public class AccountServiceImplTest {
     }
 
 
-    /*
+
     @Test
     public void getAllFromUserTest01() throws UserNotFoundException {
-        Iterable<Account> accounts = new ArrayList<>();
+        ArrayList<Account> accounts = new ArrayList<>();
         BDDMockito.doReturn(account).when(accountRepo).save(account);
+        accounts.add(account);
         BDDMockito.doReturn(accounts).when(accountRepo).findByOwner(user);
         String expected = "Account for McKenna named travel with id aafca6f6-84e1-4ec7-b5b6-9d1f9b8e68cd and balance $0.00";
         String actual = accountService.getAllFromUser(1L);
         Assertions.assertEquals(expected, actual);
-    } */
+    }
 
     @Test
     public void updateTest01() {

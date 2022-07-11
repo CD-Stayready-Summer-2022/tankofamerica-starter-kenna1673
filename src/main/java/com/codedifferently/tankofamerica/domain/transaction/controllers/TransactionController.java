@@ -72,4 +72,14 @@ public class TransactionController {
     public String accountWithdrawals(@ShellOption({"-A", "-account"}) String accountId) throws AccountNotFoundException {
         return transactionService.getAllWithdrawals(accountId);
     }
+
+    @ShellMethod("Get most recent transaction")
+    public String getRecentTransaction(@ShellOption({"-A", "--account"}) String accountId) throws AccountNotFoundException {
+        return transactionService.getMostRecentTransaction(accountId);
+    }
+
+    @ShellMethod("Get first transaction")
+    public String getFirstTransaction(@ShellOption({"-A", "-account"}) String accountId) throws AccountNotFoundException {
+        return transactionService.getFirstTransaction(accountId);
+    }
 }
